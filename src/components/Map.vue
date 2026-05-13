@@ -1,15 +1,15 @@
 <template>
   <div class="toolbar">
     <button @click="showPark = !showPark">
-      {{ showPark ? '關閉公園圖層' : '顯示台北市公園' }}
+      {{ showPark ? "關閉公園圖層" : "顯示台北市公園" }}
     </button>
   </div>
   <div class="map-container">
-    <arcgis-map 
-      basemap="streets-vector" 
-      :center="center" 
+    <arcgis-map
+      basemap="streets-vector"
+      :center="center"
       :zoom="zoom"
-      @arcgisViewReady="handleMapReady"
+      @arcgisViewReadyChange="handleViewReady"
     >
       <TPPark v-if="mapView" :view="mapView" :visible="showPark" />
     </arcgis-map>
@@ -17,26 +17,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref,shallowRef, markRaw } from "vue";
+import { ref, shallowRef, markRaw } from "vue";
 import "@arcgis/map-components/dist/components/arcgis-map";
-import "@arcgis/map-components/dist/components/arcgis-zoom";
-import '@arcgis/map-components/dist/components/arcgis-layer-list';
-import type MapView from "@arcgis/core/views/MapView"
-import TPPark from './TPPark.vue';
+import type MapView from "@arcgis/core/views/MapView";
+import TPPark from "./TPPark.vue";
 
-
-const center = ref([121.51722,25.04778]);
+const center = ref([121.51722, 25.04778]);
 const zoom = ref(14);
-const mapView = shallowRef<MapView|null>(null)
-const showPark = ref<boolean>(false)
+const mapView = shallowRef<MapView | null>(null);
+const showPark = ref<boolean>(false);
 
-const handleMapReady = (event:any)=>{
-  // 使用 markRaw 確保 MapView 不會被 Vue 變成 Proxy 物件
-  mapView.value = markRaw(event.detail.view)
-}
-
-
-
+const handleViewReady = (event: any) => {
+  const el = event.target as any;
+  if (el?.view) {
+    mapView.value = markRaw(el.view);
+  }
+};
 </script>
 
 <style scoped>
