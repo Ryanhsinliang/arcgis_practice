@@ -7,10 +7,19 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          // 告訴 Vue 這些是自定義元素
           isCustomElement: (tag) => tag.startsWith("arcgis-"),
         },
       },
     }),
   ],
+  server:{
+    proxy:{
+      '/api':{
+      target:'http://localhost:44388',
+      changeOrigin:true,
+      rewrite:(path:string)=>path.replace(/^\/api/, ''),
+      secure:false
+    }
+    }
+  }
 });

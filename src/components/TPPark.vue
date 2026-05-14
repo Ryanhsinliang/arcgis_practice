@@ -13,6 +13,7 @@ const props = defineProps<{
 }>();
 const parkLayer = shallowRef<FeatureLayer | null>(null);
 
+
 const initLayer = async () => {
   try {
     const response = await fetch("/GeoJson/TPPark.geojson");
@@ -83,8 +84,6 @@ const initLayer = async () => {
     });
     parkLayer.value = markRaw(layer);
     props.view.map?.add(parkLayer.value);
-
-    layer.when((err: any) => console.error("❌ Layer loaded 失敗:", err));
   } catch (error) {
     console.error("❌ initLayer 錯誤:", error);
   }

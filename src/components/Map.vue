@@ -14,10 +14,11 @@
       <TPPark v-if="mapView" :view="mapView" :visible="showPark" />
     </arcgis-map>
   </div>
+  <div></div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, markRaw } from "vue";
+import { ref, shallowRef, markRaw, onMounted } from "vue";
 import "@arcgis/map-components/dist/components/arcgis-map";
 import type MapView from "@arcgis/core/views/MapView";
 import TPPark from "./TPPark.vue";
@@ -33,6 +34,24 @@ const handleViewReady = (event: any) => {
     mapView.value = markRaw(el.view);
   }
 };
+
+onMounted(() => {
+  const successCallback = (position: any) => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    center.value = [longitude, latitude];
+    mapView.value?.goTo({ center: [longitude, latitude], zoom: zoom.value });
+  };
+  const errorCallback = (error: any) => {
+    console.warn(`無法取得位置：${error.message}`);
+  };
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+  } else {
+    console.warn("此瀏覽器不支援 Geolocation");
+  }
+});
 </script>
 
 <style scoped>
