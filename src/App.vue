@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import Map from "./components/Map.vue";
+import MapPanel from "./components/map/MapPanel.vue";
+import BasemapSwitcher from "./components/common/BasemapSwitcher.vue";
+import LayerToggle from "./components/common/LayerToggle.vue";
 </script>
 
 <template>
-  <Map />
+  <MapPanel />
+  <BasemapSwitcher />
+  <LayerToggle />
 </template>
