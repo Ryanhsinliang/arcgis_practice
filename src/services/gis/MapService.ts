@@ -3,6 +3,7 @@ import MapView from "@arcgis/core/views/MapView";
 import type Layer from "@arcgis/core/layers/Layer";
 import { LayerFactory } from "../factories/LayerFactory";
 import { LAYER_REGISTRY } from "../../configs/layers";
+import type KMLLayer from "@arcgis/core/layers/KMLLayer";
 
 export class MapService {
   private static view: MapView | null = null;
@@ -50,19 +51,30 @@ export class MapService {
       this.laodedLayers.set(layerId, layer);
     }
 
-    //控制顯示，隱藏
-    layer.visible = visible;
-
-    //如果是載入新圖層，自動飛過去
-    if (visible && layer.type !== "kml") {
-      //kml處理比較不同
-      await this.view.whenLayerView(layer);
-
-      //   if (layer.fullExtent) {
-      //     this.view.goTo(layer.fullExtent);
-      //   } else {
-      //     console.warn(`圖層 ${layer.id} 沒有定義 fullExtent`);
-      //   }
+    if (layer) {
+      //控制顯示，隱藏
+      layer.visible = visible;
+      if (visible) {
+        try {
+          // 確保圖層基本結構載入
+          await layer.load();
+          // 等待view為該圖層建立好渲染器，這能確保 KML 的內部資料都已經解析完畢
+          await this.view.whenLayerView(layer);
+          const skipGoTo = ["wms"].includes(layer.type as string);
+          if (!skipGoTo && layer.fullExtent) {
+            await this.view.goTo(layer.fullExtent, {
+              duration: 1000,
+              easing: "ease-in-out",
+            });
+          } else {
+            console.warn(
+              `[MapService] KML 圖層 ${layer.id} 載入成功，但 fullExtent 為空`,
+            );
+          }
+        } catch (err) {
+          console.error("KML 載入或跳轉失敗", err);
+        }
+      }
     }
   }
 }

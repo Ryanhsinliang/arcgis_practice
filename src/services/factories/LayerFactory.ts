@@ -75,10 +75,23 @@ export class LayerFactory {
         title: config.label,
         id: config.id,
         ...config.options,
+        popupTemplate: {
+          title: config.popupTemplate?.title,
+          content: config.popupTemplate?.content,
+        },
       });
     } catch (err) {
       console.error(`GeoJSON載入失敗:${config.label}`, err);
       throw err;
     }
+  }
+
+  private static createKML(config: LayerConfig): KMLLayer {
+    return new KMLLayer({
+      url: config.url,
+      title: config.label,
+      id: config.id,
+      ...config.options,
+    });
   }
 }
